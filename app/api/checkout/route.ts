@@ -1,26 +1,24 @@
 import { NextRequest, NextResponse } from "next/server"
-//import { validateCartItems } from "use-shopping-cart/utilities"
+import { validateCartItems } from "use-shopping-cart/utilities"
 
 import { inventory } from "@/config/inventory"
 import { stripe } from "@/lib/stripe"
 
-export async function POST(request: NextRequest) {
-  try {
+export async function POST(request: Request) {
     const cartDetails = await request.json()
-    //const lineItems = validateCartItems(inventory, cartDetails)
+    const lineItems = validateCartItems(inventory, cartDetails)
     const origin = request.headers.get("origin")
-
     const session = await stripe.checkout.sessions.create({
       submit_type: "pay",
       mode: "payment",
       payment_method_types: ["card"],
-      //line_items: lineItems,
+      line_items: lineItems,
       shipping_address_collection: {
-        allowed_countries: ["US", "CA"],
+        allowed_countries: ["US", "CA", "KE"],
       },
       shipping_options: [
         {
-          shipping_rate: "shr_1NnTrNI5AjsSsSwOTUPpGA8r",
+          shipping_rate: "shr_1OrnMSL1tW8ogf3CzAxUQwUX",
         },
       ],
       billing_address_collection: "auto",
@@ -29,8 +27,4 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json(session)
-  } catch (error) {
-    console.error(error) // Log any errors to the console
-    return NextResponse.error()
-  }
-}
+  } 
